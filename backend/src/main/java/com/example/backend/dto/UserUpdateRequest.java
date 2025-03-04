@@ -1,28 +1,13 @@
-package com.example.backend.entity;
+package com.example.backend.dto;
 
 import java.time.LocalDate;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
-@Entity
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class UserUpdateRequest {
     private String username;
     private String password;
     private String firstName;
     private String lastName;
     private LocalDate dob;
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
     public String getUsername() {
         return username;
     }
@@ -53,6 +38,4 @@ public class User {
     public void setDob(LocalDate dob) {
         this.dob = dob;
     }
-
-
 }
