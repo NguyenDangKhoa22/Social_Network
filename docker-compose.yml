@@ -15,16 +15,6 @@ services:
     networks:
       - social_network
 
-  # frontend:
-  #   build: ./frontend
-  #   container_name: social_frontend
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - backend
-  #   networks:
-  #     - social_network
-
   database:
     image: mysql:8.0
     container_name: social_database
