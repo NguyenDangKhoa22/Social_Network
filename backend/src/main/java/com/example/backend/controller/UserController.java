@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.backend.dto.ApiReponse;
 import com.example.backend.dto.UserCreationRequest;
 import com.example.backend.dto.UserUpdateRequest;
 import com.example.backend.entity.User;
@@ -20,8 +21,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PutMapping;
 
-
-
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -30,8 +29,11 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    User createUser(@RequestBody @Valid UserCreationRequest request){
-        return userService.creatRequest(request);
+
+    ApiReponse<User> createUser(@RequestBody @Valid UserCreationRequest request){
+        ApiReponse<User> apiReponse = new ApiReponse<>();
+        apiReponse.setResult(userService.creatRequest(request));
+        return apiReponse;
     }
     @GetMapping
     List<User> getUsers(){
