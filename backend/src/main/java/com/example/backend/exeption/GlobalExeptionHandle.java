@@ -5,12 +5,32 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.example.backend.dto.ApiReponse;
+
 @ControllerAdvice
 public class GlobalExeptionHandle {
-    @ExceptionHandler(value = RuntimeException.class)
-    public ResponseEntity<String> handlingRunTimeExeption(RuntimeException exception){
-        return ResponseEntity.badRequest().body(exception.getMessage());
+
+    @SuppressWarnings("rawtypes")
+    @ExceptionHandler(value = Exception.class)
+    public ResponseEntity<ApiReponse> handlingRunTimeExeption(RuntimeException exception){
+        
+        ApiReponse apiReponse = new ApiReponse<>();
+        apiReponse.setCode(ErrorCode.UNCATEGORIZED_EXEPTION.getCode());
+        apiReponse.setMessage(ErrorCode.UNCATEGORIZED_EXEPTION.getMessage());
+        
+        return ResponseEntity.badRequest().body(apiReponse);
     }
+    @SuppressWarnings("rawtypes")
+    @ExceptionHandler(value = AppExeption.class)
+    public ResponseEntity<ApiReponse> handlingAppExeption(AppExeption exception){
+        ErrorCode errorCode = exception.getErrorCode();
+        ApiReponse apiReponse = new ApiReponse<>();
+        apiReponse.setCode(errorCode.getCode());
+        apiReponse.setMessage(errorCode.getMessage());
+        
+        return ResponseEntity.badRequest().body(apiReponse);
+    }
+
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ResponseEntity<String> handlingValidateion(MethodArgumentNotValidException manve){
         return ResponseEntity.badRequest().body(manve.getFieldError().getDefaultMessage());
