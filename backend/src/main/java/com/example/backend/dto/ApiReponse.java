@@ -1,5 +1,8 @@
 package com.example.backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiReponse<T>{
     private int code = 1000;
     private String message;
