@@ -5,7 +5,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.example.backend.dto.ApiReponse;
+import com.example.backend.dto.request.ApiReponse;
+
 
 @ControllerAdvice
 public class GlobalExeptionHandle {
@@ -30,9 +31,22 @@ public class GlobalExeptionHandle {
         
         return ResponseEntity.badRequest().body(apiReponse);
     }
-
+    @SuppressWarnings("rawtypes")
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ResponseEntity<String> handlingValidateion(MethodArgumentNotValidException manve){
-        return ResponseEntity.badRequest().body(manve.getFieldError().getDefaultMessage());
+    public ResponseEntity<ApiReponse> handlingValidateion(MethodArgumentNotValidException exception){
+
+        String enumKey = exception.getFieldError().getDefaultMessage();
+        ErrorCode errorCode = ErrorCode.INVALID_KEY;
+        try{
+            errorCode = ErrorCode.valueOf(enumKey);
+        }catch(IllegalArgumentException i){
+
+        }
+       
+        ApiReponse apiReponse = new ApiReponse<>();
+        apiReponse.setCode(errorCode.getCode());
+        apiReponse.setMessage(errorCode.getMessage());
+
+        return ResponseEntity.badRequest().body(apiReponse);
     }
 }

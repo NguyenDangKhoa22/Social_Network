@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.backend.dto.ApiReponse;
-import com.example.backend.dto.UserCreationRequest;
-import com.example.backend.dto.UserUpdateRequest;
+import com.example.backend.dto.request.ApiReponse;
+import com.example.backend.dto.request.UserCreationRequest;
+import com.example.backend.dto.request.UserUpdateRequest;
+import com.example.backend.dto.response.UserResponse;
 import com.example.backend.entity.User;
 import com.example.backend.service.UserService;
 
@@ -32,7 +33,7 @@ public class UserController {
 
     ApiReponse<User> createUser(@RequestBody @Valid UserCreationRequest request){
         ApiReponse<User> apiReponse = new ApiReponse<>();
-        apiReponse.setResult(userService.creatRequest(request));
+        apiReponse.setResult(userService.createRequest(request));
         return apiReponse;
     }
     @GetMapping
@@ -40,11 +41,11 @@ public class UserController {
         return userService.getListUsers();
     }
     @GetMapping("/{userId}")
-    User getUser(@PathVariable("userId") Long userId){
-        return userService.getUserId(userId);
+    UserResponse getUser(@PathVariable("userId") Long userId){
+        return userService.findUserId(userId);
     }
     @PutMapping("/{userId}")
-    User updateUser(@PathVariable Long userId,@RequestBody UserUpdateRequest request){
+    UserResponse updateUser(@PathVariable Long userId,@RequestBody UserUpdateRequest request){
         return userService.updateUserId(userId, request);
     }
     @DeleteMapping("/{userId}")
