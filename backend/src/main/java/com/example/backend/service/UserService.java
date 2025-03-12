@@ -2,8 +2,8 @@ package com.example.backend.service;
 
 import java.util.List;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.backend.dto.request.UserCreationRequest;
@@ -15,22 +15,28 @@ import com.example.backend.exeption.ErrorCode;
 import com.example.backend.mapper.UserMapper;
 import com.example.backend.repository.UserRepository;
 
-@Service
-public class UserService {
-    @Autowired
-    private UserRepository userRepository;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
-    @Autowired
-    private UserMapper userMapper;
+@Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class UserService {
+    
+    UserRepository userRepository;
+
+    UserMapper userMapper;
 
     public User createRequest(UserCreationRequest request){
         
-
         if (userRepository.existsByUsername(request.getUsername()))
             throw new AppExeption(ErrorCode.USER_EXITED); 
 
         User user = userMapper.toUser(request);
 
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         return userRepository.save(user);
     }
 
