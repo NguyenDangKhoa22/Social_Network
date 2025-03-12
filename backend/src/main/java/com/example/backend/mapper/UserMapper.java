@@ -10,7 +10,10 @@ import com.example.backend.entity.User;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
+
     User toUser(UserCreationRequest request);
+
     UserResponse toUserRepository(User user);
+
     void updateUser(@MappingTarget User user, UserUpdateRequest request);
 }
