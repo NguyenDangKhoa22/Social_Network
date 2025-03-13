@@ -24,8 +24,8 @@ public class UserAuthenticate {
     UserAuthService userAuthService;
     @PostMapping("/login")
     ApiReponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request){
-        boolean result = userAuthService.authenticated(request);
-        return ApiReponse.<AuthenticationResponse>builder().result(AuthenticationResponse.builder().authenticated(result).build()).build();
+        var result = userAuthService.authenticate(request);
+        return ApiReponse.<AuthenticationResponse>builder().result(result).build();
     }
     
 }
