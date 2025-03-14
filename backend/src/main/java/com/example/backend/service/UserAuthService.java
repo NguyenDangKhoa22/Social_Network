@@ -1,16 +1,19 @@
 package com.example.backend.service;
 
+import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
 import com.example.backend.dto.request.AuthenticationRequest;
+import com.example.backend.dto.request.IntroSpectRequest;
 import com.example.backend.dto.response.AuthenticationResponse;
+import com.example.backend.dto.response.IntroSpectResponse;
 import com.example.backend.exeption.AppExeption;
 import com.example.backend.exeption.ErrorCode;
 import com.example.backend.repository.UserRepository;
@@ -18,9 +21,12 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +41,22 @@ import lombok.extern.slf4j.Slf4j;
 public class UserAuthService {
     UserRepository userRepository;
     @NonFinal
-    private static final String SECRET_KEY = "PFZeIvGj7yTnDDENrhozx7k9Z3j1v7tJDdG75bSj2wxeOltGqAJmUGmdd0Dc7xF1";
+    @Value("${jwt.signerKey}")
+    protected String SECRET_KEY ;
+
+
+    public IntroSpectResponse introSpect(IntroSpectRequest request) throws JOSEException, ParseException{
+            var token = request.getToken();
+        JWSVerifier verifier = new MACVerifier(SECRET_KEY.getBytes());
+
+        SignedJWT signedJWT = SignedJWT.parse(token);
+
+        Date expiDate = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+        var verified =  signedJWT.verify(verifier);
+
+        return IntroSpectResponse.builder().valid(verified && expiDate.after(new Date())).build();
+    }
     
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
