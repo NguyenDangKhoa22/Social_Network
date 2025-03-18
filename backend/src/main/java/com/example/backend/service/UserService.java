@@ -1,8 +1,8 @@
 package com.example.backend.service;
 
+import java.util.HashSet;
 import java.util.List;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +10,7 @@ import com.example.backend.dto.request.UserCreationRequest;
 import com.example.backend.dto.request.UserUpdateRequest;
 import com.example.backend.dto.response.UserResponse;
 import com.example.backend.entity.User;
+import com.example.backend.enums.Role;
 import com.example.backend.exeption.AppExeption;
 import com.example.backend.exeption.ErrorCode;
 import com.example.backend.mapper.UserMapper;
@@ -25,19 +26,23 @@ import lombok.experimental.FieldDefaults;
 public class UserService {
     
     UserRepository userRepository;
-
     UserMapper userMapper;
+    PasswordEncoder passwordEncoder;
 
-    public User createRequest(UserCreationRequest request){
+    public UserResponse createRequest(UserCreationRequest request){
         
         if (userRepository.existsByUsername(request.getUsername()))
             throw new AppExeption(ErrorCode.USER_EXITED); 
 
         User user = userMapper.toUser(request);
 
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        return userRepository.save(user);
+
+        HashSet<String> role = new HashSet<>();
+        role.add(Role.USER.name());
+
+        user.setRole(role);
+        return userMapper.toUserReponse(userRepository.save(user));
     }
 
     public List<User> getListUsers(){
@@ -45,7 +50,7 @@ public class UserService {
     }
 
     public UserResponse findUserId(Long id){
-        return userMapper.toUserRepository(userRepository.findById(id)
+        return userMapper.toUserReponse(userRepository.findById(id)
                         .orElseThrow(() -> new RuntimeException("User not found")));
     }
 
@@ -55,7 +60,7 @@ public class UserService {
                                   .orElseThrow(() -> new RuntimeException("User not found"));
         userMapper.updateUser(user, request);
         
-        return userMapper.toUserRepository(userRepository.save(user));
+        return userMapper.toUserReponse(userRepository.save(user));
     }
     public void deleteUser(Long userId){
         userRepository.deleteById(userId);

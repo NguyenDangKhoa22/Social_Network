@@ -13,7 +13,7 @@ public interface UserMapper {
 
     User toUser(UserCreationRequest request);
 
-    UserResponse toUserRepository(User user);
+    UserResponse toUserReponse(User user);
 
     void updateUser(@MappingTarget User user, UserUpdateRequest request);
 }
