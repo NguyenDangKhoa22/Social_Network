@@ -29,7 +29,7 @@ public class UserService {
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
 
-    public UserResponse createRequest(UserCreationRequest request){
+    public UserResponse createUser(UserCreationRequest request){
         
         if (userRepository.existsByUsername(request.getUsername()))
             throw new AppExeption(ErrorCode.USER_EXITED); 
