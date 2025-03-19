@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import java.util.List;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,9 +22,11 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.web.bind.annotation.PutMapping;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -35,11 +38,14 @@ public class UserController {
 
     ApiReponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request){
         ApiReponse<UserResponse> apiReponse = new ApiReponse<>();
-        apiReponse.setResult(userService.createRequest(request));
+        apiReponse.setResult(userService.createUser(request));
         return apiReponse;
     }
     @GetMapping
     List<User> getUsers(){
+        var authenlication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Username : {}",authenlication.getName());
+        authenlication.getAuthorities().forEach(grantedAuthority->log.info(grantedAuthority.getAuthority()));
         return userService.getListUsers();
     }
     @GetMapping("/{userId}")

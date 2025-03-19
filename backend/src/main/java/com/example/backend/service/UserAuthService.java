@@ -4,16 +4,19 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.StringJoiner;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.example.backend.dto.request.AuthenticationRequest;
 import com.example.backend.dto.request.IntroSpectRequest;
 import com.example.backend.dto.response.AuthenticationResponse;
 import com.example.backend.dto.response.IntroSpectResponse;
+import com.example.backend.entity.User;
 import com.example.backend.exeption.AppExeption;
 import com.example.backend.exeption.ErrorCode;
 import com.example.backend.repository.UserRepository;
@@ -69,20 +72,20 @@ public class UserAuthService {
         if (!authenlicated) {
             throw new AppExeption(ErrorCode.UNAUTHENTICATED);
         }
-        var token = generateToken(request.getUsername());
+        var token = generateToken(user);
 
         return AuthenticationResponse.builder().token(token).authenticated(true).build();
     } 
     
-    private String generateToken(String username){
+    private String generateToken(User user){
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
         
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                    .subject(username)
+                    .subject(user.getUsername())
                     .issuer("localhost:8080")
                     .issueTime(new Date())
                     .expirationTime(new Date(Instant.now().plus(1,ChronoUnit.HOURS).toEpochMilli()))
-                    .claim("customeClaim", "Custom")
+                    .claim("scope", builderScope(user))
                     .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
 
@@ -96,5 +99,13 @@ public class UserAuthService {
             e.printStackTrace();
         }
         return jwsObject.serialize();
+    }
+
+    private String builderScope (User user){
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        if(!CollectionUtils.isEmpty(user.getRole()) )
+            user.getRole().forEach(stringJoiner::add);
+        
+        return stringJoiner.toString();
     }
 }
