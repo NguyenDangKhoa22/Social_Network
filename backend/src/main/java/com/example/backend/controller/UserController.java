@@ -15,7 +15,6 @@ import com.example.backend.dto.request.ApiReponse;
 import com.example.backend.dto.request.UserCreationRequest;
 import com.example.backend.dto.request.UserUpdateRequest;
 import com.example.backend.dto.response.UserResponse;
-import com.example.backend.entity.User;
 import com.example.backend.service.UserService;
 
 import jakarta.validation.Valid;
@@ -42,11 +41,11 @@ public class UserController {
         return apiReponse;
     }
     @GetMapping
-    List<User> getUsers(){
+    ApiReponse<List<UserResponse>> getUsers(){
         var authenlication = SecurityContextHolder.getContext().getAuthentication();
         log.info("Username : {}",authenlication.getName());
         authenlication.getAuthorities().forEach(grantedAuthority->log.info(grantedAuthority.getAuthority()));
-        return userService.getListUsers();
+        return ApiReponse.<List<UserResponse>>builder().result(userService.getListUsers()).build();
     }
     @GetMapping("/{userId}")
     UserResponse getUser(@PathVariable("userId") Long userId){
