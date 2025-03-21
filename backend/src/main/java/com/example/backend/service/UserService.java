@@ -45,8 +45,8 @@ public class UserService {
         return userMapper.toUserReponse(userRepository.save(user));
     }
 
-    public List<User> getListUsers(){
-        return userRepository.findAll();
+    public List<UserResponse> getListUsers(){
+        return userRepository.findAll().stream().map(userMapper::toUserReponse).toList();
     }
 
     public UserResponse findUserId(Long id){
