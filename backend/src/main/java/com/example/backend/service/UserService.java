@@ -3,6 +3,8 @@ package com.example.backend.service;
 import java.util.HashSet;
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,9 @@ import com.example.backend.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -45,8 +49,19 @@ public class UserService {
         return userMapper.toUserReponse(userRepository.save(user));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getListUsers(){
+        log.info("login with admin");
         return userRepository.findAll().stream().map(userMapper::toUserReponse).toList();
+    }
+
+    public UserResponse getMyInfor(){
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+
+        User user = userRepository.findByUsername(name).orElseThrow(
+            ()->new AppExeption(ErrorCode.USERID_NOT_EXITTED));
+        return userMapper.toUserReponse(user);
     }
 
     public UserResponse findUserId(Long id){
