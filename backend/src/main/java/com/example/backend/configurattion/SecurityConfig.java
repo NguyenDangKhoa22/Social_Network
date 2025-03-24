@@ -20,6 +20,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.example.backend.exeption.ErrorCode;
+
 
 @Configuration
 @EnableWebSecurity
@@ -38,9 +40,12 @@ public class SecurityConfig {
 
             .anyRequest().authenticated());
 
-        http.oauth2ResourceServer(oauth2->oauth2.jwt(jwtConfigurer -> jwtConfigurer
+        http.oauth2ResourceServer
+            (oauth2->oauth2.jwt(jwtConfigurer -> jwtConfigurer
             .decoder(jwtDecoder())
-            .jwtAuthenticationConverter(jwtAuthenticationConverter())));
+            .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+            .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+        );
 
         http.csrf(AbstractHttpConfigurer::disable);
         return http.build();

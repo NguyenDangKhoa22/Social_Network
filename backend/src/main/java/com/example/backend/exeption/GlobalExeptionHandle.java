@@ -1,6 +1,8 @@
 package com.example.backend.exeption;
 
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,8 +31,21 @@ public class GlobalExeptionHandle {
         apiReponse.setCode(errorCode.getCode());
         apiReponse.setMessage(errorCode.getMessage());
         
-        return ResponseEntity.badRequest().body(apiReponse);
+        return ResponseEntity
+                .status(errorCode.getStatusCode())
+                .body(apiReponse);
     }
+    @SuppressWarnings("rawtypes")
+    @ExceptionHandler(value = AccessDeniedException.class)
+    public ResponseEntity<ApiReponse> handingAccessDeniedException(AccessDeniedException exception){
+        ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
+        return ResponseEntity.status(errorCode.getStatusCode())
+                             .body(ApiReponse.builder()
+                             .code(errorCode.getCode())
+                             .message(errorCode.getMessage()).build());
+    }
+
+
     @SuppressWarnings("rawtypes")
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ResponseEntity<ApiReponse> handlingValidateion(MethodArgumentNotValidException exception){
