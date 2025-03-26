@@ -3,6 +3,8 @@ package com.example.backend.dto.response;
 import java.time.LocalDate;
 import java.util.Set;
 
+import com.example.backend.entity.Role;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +22,6 @@ public class UserResponse {
     String firstName;
     String lastName;
     LocalDate dob;
-    Set<String> role;
+    Set<Role> role;
     
 }
