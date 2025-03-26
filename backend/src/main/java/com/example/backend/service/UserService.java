@@ -16,6 +16,7 @@ import com.example.backend.enums.Role;
 import com.example.backend.exeption.AppExeption;
 import com.example.backend.exeption.ErrorCode;
 import com.example.backend.mapper.UserMapper;
+import com.example.backend.repository.RoleRepository;
 import com.example.backend.repository.UserRepository;
 
 import lombok.AccessLevel;
@@ -31,6 +32,7 @@ public class UserService {
     
     UserRepository userRepository;
     UserMapper userMapper;
+    RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
 
     public UserResponse createUser(UserCreationRequest request){
@@ -45,11 +47,12 @@ public class UserService {
         HashSet<String> role = new HashSet<>();
         role.add(Role.USER.name());
 
-        user.setRole(role);
+        // user.setRole(role);
         return userMapper.toUserReponse(userRepository.save(user));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasAuthority('APPROVE_POST')")
     public List<UserResponse> getListUsers(){
         log.info("login with admin");
         return userRepository.findAll().stream().map(userMapper::toUserReponse).toList();
@@ -74,7 +77,12 @@ public class UserService {
         User user = userRepository.findById(userId)
                                   .orElseThrow(() -> new RuntimeException("User not found"));
         userMapper.updateUser(user, request);
-        
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        var roles = roleRepository.findAllById(request.getRole());
+        user.setRole(new HashSet<>(roles));
+
         return userMapper.toUserReponse(userRepository.save(user));
     }
     public void deleteUser(Long userId){

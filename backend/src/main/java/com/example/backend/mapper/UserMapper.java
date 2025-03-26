@@ -1,6 +1,7 @@
 package com.example.backend.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import com.example.backend.dto.request.UserCreationRequest;
@@ -15,5 +16,7 @@ public interface UserMapper {
 
     UserResponse toUserReponse(User user);
 
+    @Mapping(target = "role", ignore = true)
     void updateUser(@MappingTarget User user, UserUpdateRequest request);
+    
 }
