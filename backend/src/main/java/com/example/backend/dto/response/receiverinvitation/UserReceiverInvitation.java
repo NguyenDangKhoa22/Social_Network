@@ -14,7 +14,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserReceiverInvitation<T> {
+public class UserReceiverInvitation {
     Long senderId;
     Long receiverId;
     String senderUserName;
