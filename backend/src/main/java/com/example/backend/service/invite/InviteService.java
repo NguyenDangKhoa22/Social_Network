@@ -4,10 +4,13 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.backend.dto.request.send_invitation.UserSendInvitation;
-import com.example.backend.dto.response.receiverinvitation.UserReceiverInvitation;
+import com.example.backend.dto.request.send_invitation.InviteRequest;
+import com.example.backend.dto.response.receiverinvitation.InviteResponse;
+import com.example.backend.exeption.AppExeption;
+import com.example.backend.exeption.ErrorCode;
 import com.example.backend.mapper.InviteMapper;
 import com.example.backend.repository.InviteRepository;
+import com.example.backend.repository.UserRepository;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -19,17 +22,30 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class InviteService {
+    UserRepository userRepository;
     InviteRepository inviteRepository;
     InviteMapper inviteMapper;
-    public UserReceiverInvitation create (UserSendInvitation request){
-        var invite = inviteMapper.toFriend(request);
-        invite = inviteRepository.save(invite);
-        return inviteMapper.toUserReceiverInvitation(invite);
+
+    public InviteResponse create (InviteRequest request){
+        var sender = userRepository.findById(request.getSenderId())
+                .orElseThrow(()->new IllegalArgumentException("Người gửi không tồn tại!"));
+        var receiver = userRepository.findById(request.getReceiverId())
+        .orElseThrow(()->new IllegalArgumentException("Người gửi không tồn tại!"));
+
+        if (inviteRepository.existsBySenderAndReceiver(sender,receiver)) {
+            throw new AppExeption(ErrorCode.USERID_NOT_EXITTED);
+        }
+
+        var invite = inviteMapper.toInvitetation(request);
+            invite.setSender(sender.getId());
+            invite.setReceiver(receiver.getId());
+            invite = inviteRepository.save(invite);
+        return inviteMapper.toInvitationResponse(invite);
     }
 
-    public List<UserReceiverInvitation> getAll (UserSendInvitation request){
+    public List<InviteResponse> getAll (){
         var invite = inviteRepository.findAll();
-        return invite.stream().map(inviteMapper::toUserReceiverInvitation).toList();
+        return invite.stream().map(inviteMapper::toInvitationResponse).toList();
     }
 
     public void delete (Long id){

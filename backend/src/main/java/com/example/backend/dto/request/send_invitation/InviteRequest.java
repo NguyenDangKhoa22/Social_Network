@@ -1,4 +1,4 @@
-package com.example.backend.dto.response.receiverinvitation;
+package com.example.backend.dto.request.send_invitation;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -14,10 +14,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserReceiverInvitation {
+public class InviteRequest {
     Long senderId;
     Long receiverId;
-    String senderUserName;
-    String status;
     String message;
 }

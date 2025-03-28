@@ -42,7 +42,9 @@ public class User {
     Set<Role> role;
     
     @OneToMany
-    Set<InviteFriend> inviteFriends;
+    Set<Invitetation> sentInvitations;
 
-
+    @OneToMany
+    Set<Invitetation> receivedInvitations;
+    
 }
