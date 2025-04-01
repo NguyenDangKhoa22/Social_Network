@@ -6,17 +6,21 @@ import org.mapstruct.MappingTarget;
 
 import com.example.backend.dto.request.UserCreationRequest;
 import com.example.backend.dto.request.UserUpdateRequest;
+import com.example.backend.dto.response.IntroSpectResponse;
 import com.example.backend.dto.response.UserResponse;
 import com.example.backend.entity.User;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-
     User toUser(UserCreationRequest request);
 
     UserResponse toUserReponse(User user);
 
     @Mapping(target = "role", ignore = true)
     void updateUser(@MappingTarget User user, UserUpdateRequest request);
+
+    @Mapping(target = "valid", source = "valid")
+    @Mapping(target = "userId", source = "user.id")
+    IntroSpectResponse toIntroSpectResponse(User user, boolean valid); 
     
 }

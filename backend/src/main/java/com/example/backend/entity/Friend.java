@@ -1,10 +1,10 @@
 package com.example.backend.entity;
 
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
@@ -19,23 +19,21 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Entity
-
-public class Invitetation {
+@IdClass(FriendId.class)
+public class Friend {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-
     @ManyToOne
-    @JoinColumn(name = "sender_id")
-    Long sender;
+    @JoinColumn(name = "user_id")
+    User user;
 
+    @Id
     @ManyToOne
-    @JoinColumn(name = "receiver_id")
-    Long receiver;
+    @JoinColumn(name = "friend_id")
+    User friend;
 
-    String status;
-    String message;
+    Integer status;
+    LocalDateTime createAt;
 }

@@ -3,7 +3,7 @@ package com.example.backend.dto.response;
 import java.time.LocalDate;
 import java.util.Set;
 
-import com.example.backend.entity.Invitetation;
+import com.example.backend.entity.Invitation;
 import com.example.backend.entity.Role;
 
 import lombok.AccessLevel;
@@ -24,6 +24,6 @@ public class UserResponse {
     String lastName;
     LocalDate dob;
     Set<Role> role;
-    Set<Invitetation> invites;
+    Set<Invitation> invites;
     
 }
