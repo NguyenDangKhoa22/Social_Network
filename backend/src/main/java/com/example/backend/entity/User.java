@@ -3,7 +3,7 @@ package com.example.backend.entity;
 import java.time.LocalDate;
 import java.util.Set;
 
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 
 import jakarta.persistence.GeneratedValue;
@@ -39,10 +39,14 @@ public class User {
     LocalDate dob;
 
     @ManyToMany
-    Set<Role> role;
-    
-    @OneToMany
-    Set<InviteFriend> inviteFriends;
+    Set<Role> roles;
 
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<FriendRequest> sentRequests;
 
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<FriendRequest> receiverRequests;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<Friend> friends;
 }

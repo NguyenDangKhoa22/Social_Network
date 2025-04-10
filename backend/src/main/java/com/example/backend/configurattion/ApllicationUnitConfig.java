@@ -28,9 +28,9 @@ public class ApllicationUnitConfig {
             if(userRepository.findByUsername("admin").isEmpty()){
                 var roles = new HashSet<String>();
                 roles.add(Role.ADMIN.name()); 
+
                 User user = User.builder().username("admin")
                                           .password(passwordEncoder.encode("admin"))
-                                          //.role(roles)
                                           .build();
                 userRepository.save(user);
                 log.warn("admin user has been created with default password: admin,please change it ");

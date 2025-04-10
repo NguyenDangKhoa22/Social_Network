@@ -1,21 +1,17 @@
-package com.example.backend.dto.request.send_invitation;
+package com.example.backend.dto.request.friendfuction;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserSendInvitation {
-    Long senderId;
-    Long receiverId;
-    String message;
+public class FriendDTORequest {
+    Long receiverid;
 }

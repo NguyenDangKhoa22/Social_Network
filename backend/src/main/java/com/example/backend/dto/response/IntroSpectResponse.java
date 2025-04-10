@@ -15,4 +15,5 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class IntroSpectResponse {
     boolean valid;
+    Long userId;
 }

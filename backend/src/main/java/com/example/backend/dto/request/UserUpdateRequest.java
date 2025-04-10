@@ -1,7 +1,7 @@
 package com.example.backend.dto.request;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,6 +21,6 @@ public class UserUpdateRequest {
     String firstName;
     String lastName;
     LocalDate dob;
-    Set<String> Role;
+    List<String> roles;
     
 }

@@ -46,8 +46,7 @@ public class UserService {
 
         HashSet<String> role = new HashSet<>();
         role.add(Role.USER.name());
-
-        // user.setRole(role);
+        
         return userMapper.toUserReponse(userRepository.save(user));
     }
 
@@ -80,8 +79,8 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        var roles = roleRepository.findAllById(request.getRole());
-        user.setRole(new HashSet<>(roles));
+        var roles = roleRepository.findAllById(request.getRoles());
+        user.setRoles(new HashSet<>(roles));
 
         return userMapper.toUserReponse(userRepository.save(user));
     }

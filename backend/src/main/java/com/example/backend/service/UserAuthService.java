@@ -19,6 +19,7 @@ import com.example.backend.dto.response.IntroSpectResponse;
 import com.example.backend.entity.User;
 import com.example.backend.exeption.AppExeption;
 import com.example.backend.exeption.ErrorCode;
+import com.example.backend.mapper.UserMapper;
 import com.example.backend.repository.UserRepository;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -43,13 +44,15 @@ import lombok.extern.slf4j.Slf4j;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserAuthService {
     UserRepository userRepository;
+    UserMapper userMapper;
     @NonFinal
     @Value("${jwt.signerKey}")
     protected String SECRET_KEY ;
 
 
     public IntroSpectResponse introSpect(IntroSpectRequest request) throws JOSEException, ParseException{
-            var token = request.getToken();
+        var token = request.getToken();
+
         JWSVerifier verifier = new MACVerifier(SECRET_KEY.getBytes());
 
         SignedJWT signedJWT = SignedJWT.parse(token);
@@ -58,7 +61,13 @@ public class UserAuthService {
 
         var verified =  signedJWT.verify(verifier);
 
-        return IntroSpectResponse.builder().valid(verified && expiDate.after(new Date())).build();
+        JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
+
+        Long userId = claims.getLongClaim("userId");
+
+        User user = User.builder().id(userId).build();
+
+        return userMapper.toIntroSpectResponse(user, verified && expiDate.after(new Date()));
     }
     
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -85,6 +94,7 @@ public class UserAuthService {
                     .issuer("localhost:8080")
                     .issueTime(new Date())
                     .expirationTime(new Date(Instant.now().plus(1,ChronoUnit.HOURS).toEpochMilli()))
+                    .claim("userId", user.getId())
                     .claim("scope", builderScope(user))
                     .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -103,8 +113,8 @@ public class UserAuthService {
 
     private String builderScope (User user){
         StringJoiner stringJoiner = new StringJoiner(" ");
-        if(!CollectionUtils.isEmpty(user.getRole()))
-           user.getRole().forEach(
+        if(!CollectionUtils.isEmpty(user.getRoles()))
+           user.getRoles().forEach(
             role->{
                 stringJoiner.add("ROLE_"+role.getName());
                 if (!CollectionUtils.isEmpty(role.getPermissions()))
