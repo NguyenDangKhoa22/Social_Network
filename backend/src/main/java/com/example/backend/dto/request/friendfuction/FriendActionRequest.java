@@ -1,25 +1,21 @@
-package com.example.backend.dto.response;
+package com.example.backend.dto.request.friendfuction;
 
-import java.time.LocalDate;
-import java.util.Set;
+import com.example.backend.enums.Status;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserResponse {
-    Long id;
-    String username;
-    String firstName;
-    String lastName;
-    LocalDate dob;
-    Set<RoleReponse> roles;
-    
+public class FriendActionRequest {
+    @NotNull(message = "Status is required")
+    Status status;
 }

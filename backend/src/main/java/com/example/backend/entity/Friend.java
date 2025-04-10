@@ -2,17 +2,20 @@ package com.example.backend.entity;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 @Getter
@@ -20,20 +23,26 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "friends")
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@IdClass(FriendId.class)
 public class Friend {
-    @Id
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @EmbeddedId
+    FriendId id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     User user;
 
-    @Id
-    @ManyToOne
-    @JoinColumn(name = "friend_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "friend_id",insertable = false, updatable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     User friend;
 
-    Integer status;
-    LocalDateTime createAt;
+    
+
+    LocalDateTime createdAt;
 }

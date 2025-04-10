@@ -39,14 +39,14 @@ public class User {
     LocalDate dob;
 
     @ManyToMany
-    Set<Role> role;
-    
-    @OneToMany(mappedBy = "sender",cascade = CascadeType.ALL,orphanRemoval = true)
-    Set<Invitation> sendInvites; 
+    Set<Role> roles;
 
-    @OneToMany(mappedBy = "receiver",cascade = CascadeType.ALL,orphanRemoval = true)
-    Set<Invitation> receiverInvites;
-    
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<FriendRequest> sentRequests;
+
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<FriendRequest> receiverRequests;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<Friend> friends;
 }

@@ -1,6 +1,5 @@
 package com.example.backend.entity;
 
-
 import java.time.LocalDateTime;
 
 import com.example.backend.enums.Status;
@@ -13,8 +12,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,32 +24,24 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Entity
-@Table(
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"sender_id","receiver_id"})
-    }
-)
-public class Invitation {
+public class FriendRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @ManyToOne
-    @JoinColumn(name = "sender_id",nullable = false)
+    @JoinColumn(name = "sender_id")
     User sender;
 
     @ManyToOne
-    @JoinColumn(name = "receiver_id",nullable = false)
+    @JoinColumn(name = "receiver_id")
     User receiver;
 
     @Enumerated(EnumType.STRING)
     Status status;
 
-    String message;
-    
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
+    LocalDateTime createdAt;
 }

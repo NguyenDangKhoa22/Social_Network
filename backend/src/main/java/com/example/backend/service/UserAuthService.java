@@ -51,7 +51,8 @@ public class UserAuthService {
 
 
     public IntroSpectResponse introSpect(IntroSpectRequest request) throws JOSEException, ParseException{
-            var token = request.getToken();
+        var token = request.getToken();
+
         JWSVerifier verifier = new MACVerifier(SECRET_KEY.getBytes());
 
         SignedJWT signedJWT = SignedJWT.parse(token);
@@ -61,6 +62,7 @@ public class UserAuthService {
         var verified =  signedJWT.verify(verifier);
 
         JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
+
         Long userId = claims.getLongClaim("userId");
 
         User user = User.builder().id(userId).build();
@@ -111,8 +113,8 @@ public class UserAuthService {
 
     private String builderScope (User user){
         StringJoiner stringJoiner = new StringJoiner(" ");
-        if(!CollectionUtils.isEmpty(user.getRole()))
-           user.getRole().forEach(
+        if(!CollectionUtils.isEmpty(user.getRoles()))
+           user.getRoles().forEach(
             role->{
                 stringJoiner.add("ROLE_"+role.getName());
                 if (!CollectionUtils.isEmpty(role.getPermissions()))
