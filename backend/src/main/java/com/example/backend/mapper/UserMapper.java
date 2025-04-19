@@ -14,6 +14,8 @@ import com.example.backend.entity.User;
 public interface UserMapper {
     User toUser(UserCreationRequest request);
 
+    @Mapping(target = "senders", source = "user.sentRequests")
+    @Mapping(target = "receivers", source = "user.receiverRequests")
     UserResponse toUserReponse(User user);
 
     @Mapping(target = "roles", ignore = true)

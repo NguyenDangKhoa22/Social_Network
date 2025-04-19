@@ -46,6 +46,9 @@ public class UserService {
 
         HashSet<String> role = new HashSet<>();
         role.add(Role.USER.name());
+
+        user.setSentRequests(new HashSet<>());
+        user.setReceiverRequests(new HashSet<>());
         
         return userMapper.toUserReponse(userRepository.save(user));
     }

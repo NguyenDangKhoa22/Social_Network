@@ -1,6 +1,5 @@
-package com.example.backend.dto.request.friendfuction;
+package com.example.backend.dto.response.friendfuction;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,8 +12,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FriendActionRequest {
-    Long senderId;
-    @NotNull(message = "Status is required")
-    String status;
+public class FriendActionResponse {
+    String message;
+    Long friendId;
 }

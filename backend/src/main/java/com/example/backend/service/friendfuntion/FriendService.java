@@ -2,11 +2,15 @@ package com.example.backend.service.friendfuntion;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.example.backend.dto.request.friendfuction.FriendActionRequest;
 import com.example.backend.dto.request.friendfuction.FriendDTORequest;
 import com.example.backend.dto.response.friendfuction.FriendActionDTOResponse;
+import com.example.backend.dto.response.friendfuction.FriendActionResponse;
 import com.example.backend.entity.FriendRequest;
 import com.example.backend.entity.User;
 import com.example.backend.enums.Status;
@@ -47,9 +51,45 @@ public class FriendService {
                     .status(Status.PENDING)
                     .createdAt(LocalDateTime.now())
                     .build();
-
         friendRepository.save(friendRequest);
+        
+        sender.getSentRequests().add(friendRequest);
+        receiver.getReceiverRequests().add(friendRequest);
+
+        userRepository.save(sender);
+        userRepository.save(receiver);
+        
         return friendMapper.toFriendDTOResponse(friendRequest);
     }
-    
+    public List<FriendActionDTOResponse> getReceivedInvite(String token) throws ParseException, JOSEException{
+        Long userId = jwtUtils.getUserId(token);
+        User receiver = userRepository.findById(userId)
+        .orElseThrow(()-> new RuntimeException("receiver not found"));
+        
+        List<FriendRequest> requests = friendRepository.findByReceiver(receiver);
+
+        return requests.stream().map(friendMapper::toFriendDTOResponse).collect(Collectors.toList());
+    }
+    public FriendActionResponse responseInvite(FriendActionRequest request, String token) throws ParseException, JOSEException{
+        Long receiverId = jwtUtils.getUserId(token);
+        Long senderId = request.getSenderId();
+        
+        FriendRequest friendRequest = friendRepository
+        .findBySenderIdAndReceiverId(senderId, receiverId)
+        .orElseThrow(()->new RuntimeException("Friend request no found"));
+
+        String action = request.getStatus();
+        if(action.equalsIgnoreCase("ACCEPT")){
+            friendRequest.setStatus(Status.ACCEPTED);
+        }else if(action.equalsIgnoreCase("REJECT")){
+            friendRequest.setStatus(Status.REJECTED);
+        }else{{
+            throw new IllegalArgumentException("Invalid action: "+ action);
+        }}
+
+        friendRepository.save(friendRequest);
+
+        return friendMapper.toFriendActionResponse(friendRequest);
+
+    }
 }
