@@ -16,7 +16,7 @@ public enum ErrorCode {
     USERID_NOT_EXITTED(1008,"Id not exited",HttpStatus.BAD_REQUEST),
     UNAUTHENTICATED(1006,"unauthenticated",HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1007,"you do not have permission",HttpStatus.FORBIDDEN),
-    INVALID_DOB(1008,"you enough old to enter",HttpStatus.BAD_REQUEST);
+    INVALID_DOB(1008,"your age must be at least {min}",HttpStatus.BAD_REQUEST);
 
     
         private int code;
