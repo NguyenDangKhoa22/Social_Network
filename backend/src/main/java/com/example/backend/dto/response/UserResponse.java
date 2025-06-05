@@ -3,8 +3,6 @@ package com.example.backend.dto.response;
 import java.time.LocalDate;
 import java.util.Set;
 
-import com.example.backend.dto.response.friendfuction.FriendDTO;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +21,4 @@ public class UserResponse {
     String lastName;
     LocalDate dob;
     Set<RoleReponse> roles;
-    Set<FriendDTO> senders;
-    Set<FriendDTO> receivers;
 }
