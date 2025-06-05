@@ -1,4 +1,5 @@
 package com.example.backend.dto.response.friendfuction;
+
 import java.time.LocalDateTime;
 
 import com.example.backend.enums.Status;
@@ -15,8 +16,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FriendActionDTOResponse {
-    FriendDTO sender;
+public class FriendReceiverDTOResponse {
     FriendDTO receiver;
     Status status;
     LocalDateTime createdAt;
