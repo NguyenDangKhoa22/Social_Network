@@ -1,10 +1,15 @@
-import React from "react";
+import React, { ReactNode } from "react";
 
 export default function BlogLayout ({
-    children,
+    children
 }:{
     children: React.ReactNode
 }
 ){
-    return <section>{children}</section>
+    type Props = {children : ReactNode};
+
+    const Component = ({children}:Props) =><div>{children}</div>
+
+
+    return <Component>{children}</Component>
   }
