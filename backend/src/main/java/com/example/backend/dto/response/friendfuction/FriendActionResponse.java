@@ -14,5 +14,5 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FriendActionResponse {
     String message;
-    Long friendId;
+    String friendId;
 }

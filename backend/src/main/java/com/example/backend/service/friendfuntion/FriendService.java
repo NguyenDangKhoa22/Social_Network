@@ -18,11 +18,11 @@ import com.example.backend.dto.response.friendfuction.FriendSenderDTOResponse;
 import com.example.backend.entity.FriendRequest;
 import com.example.backend.entity.User;
 import com.example.backend.enums.Status;
-import com.example.backend.helper.JwtUtils;
 import com.example.backend.mapper.friendfunction.FriendActionMapper;
 import com.example.backend.mapper.friendfunction.FriendDTOMapper;
 import com.example.backend.repository.FriendRequestRepository;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.service.UserAuthService;
 import com.nimbusds.jose.JOSEException;
 
 import lombok.AccessLevel;
@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Builder
 public class FriendService {
-    JwtUtils jwtUtils;
+    UserAuthService jwtUtils;
     UserRepository userRepository;
     FriendActionMapper friendMapper;
     FriendRequestRepository friendRepository;
@@ -45,7 +45,7 @@ public class FriendService {
 
     // Send a friend request
     public FriendActionDTOResponse sendInvite(FriendDTORequest request, String token) throws ParseException, JOSEException{
-        Long senderId = jwtUtils.getUserId(token);
+        String senderId = jwtUtils.getStringId(token);
         User sender = userRepository.findById(senderId)
         .orElseThrow(()-> new RuntimeException("Sender not found"));
         
@@ -75,7 +75,7 @@ public class FriendService {
 
     // Get the list of friend receiver 
     public List<FriendReceiverDTOResponse> getReceivedInvite(String token) throws ParseException, JOSEException{
-        Long userId = jwtUtils.getUserId(token);
+        String userId = jwtUtils.getStringId(token);
         User receiver = userRepository.findById(userId)
         .orElseThrow(()-> new RuntimeException("receiver not found"));
         
@@ -85,7 +85,7 @@ public class FriendService {
     }
     //Get the list of friend invite
     public List<FriendSenderDTOResponse> getSenderInvite(String token) throws ParseException,JOSEException{
-         Long userId = jwtUtils.getUserId(token);
+        String userId = jwtUtils.getStringId(token);
         User receiver = userRepository.findById(userId)
         .orElseThrow(()-> new RuntimeException("receiver not found"));
         
@@ -96,8 +96,8 @@ public class FriendService {
 
     // reponse to a friend request
     public FriendActionResponse responseInvite(FriendActionRequest request, String token) throws ParseException, JOSEException{
-        Long receiverId = jwtUtils.getUserId(token);
-        Long senderId = request.getSenderId();
+        String receiverId = jwtUtils.getStringId(token);
+        String senderId = request.getSenderId();
         
         FriendRequest friendRequest = friendRepository
         .findBySenderIdAndReceiverId(senderId, receiverId)
@@ -118,7 +118,7 @@ public class FriendService {
 
     }
     public List<FriendDTO> friendUser(String token) throws ParseException, JOSEException{
-        Long userId = jwtUtils.getUserId(token);
+        String userId = jwtUtils.getStringId(token);
 
         User user = userRepository.findById(userId)
         .orElseThrow(()->new RuntimeException("User not found"));
@@ -130,7 +130,7 @@ public class FriendService {
         .map(req ->friendDTOMapper.toFriendDTO(getFriendFromRequest(req, userId)))
         .collect(Collectors.toList());
     }
-    public User getFriendFromRequest(FriendRequest req, Long currentId){
+    public User getFriendFromRequest(FriendRequest req, String currentId){
         return req.getSender().getId().equals(currentId) ?req.getReceiver():req.getSender();
     }
 }

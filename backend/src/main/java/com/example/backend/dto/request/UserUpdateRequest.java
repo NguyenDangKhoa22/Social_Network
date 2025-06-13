@@ -1,9 +1,6 @@
 package com.example.backend.dto.request;
-
 import java.time.LocalDate;
 import java.util.List;
-
-import com.example.backend.validator.DobConstraint;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,7 +19,6 @@ public class UserUpdateRequest {
     String password;
     String firstName;
     String lastName;
-    @DobConstraint(min = 16,message = "INVALID_DOB")
     LocalDate dob;
     List<String> roles;
     

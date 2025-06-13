@@ -14,7 +14,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FriendActionRequest {
-    Long senderId;
+    String senderId;
     @NotNull(message = "Status is required")
     String status;
 }

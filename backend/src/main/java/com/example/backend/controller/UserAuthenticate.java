@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.backend.dto.request.ApiReponse;
 import com.example.backend.dto.request.AuthenticationRequest;
+import com.example.backend.dto.request.BlackListTokenRequest;
 import com.example.backend.dto.request.IntroSpectRequest;
 import com.example.backend.dto.response.AuthenticationResponse;
 import com.example.backend.dto.response.IntroSpectResponse;
@@ -39,5 +40,10 @@ public class UserAuthenticate {
             throws ParseException, JOSEException{
         var result = userAuthService.introSpect(request);
         return ApiReponse.<IntroSpectResponse>builder().result(result).build();
+    }
+    @PostMapping("/logout")
+    public ApiReponse<Void> authenticate(@RequestBody BlackListTokenRequest request) throws JOSEException, ParseException{
+        userAuthService.logout(request);
+        return ApiReponse.<Void>builder().build();
     }
 }
