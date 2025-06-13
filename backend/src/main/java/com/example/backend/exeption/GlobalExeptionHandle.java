@@ -25,7 +25,7 @@ public class GlobalExeptionHandle {
     @SuppressWarnings("rawtypes")
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ApiReponse> handlingRunTimeExeption(RuntimeException exception){
-        
+        log.error("Unhandled exception: ", exception);
         ApiReponse apiReponse = new ApiReponse<>();
         apiReponse.setCode(ErrorCode.UNCATEGORIZED_EXEPTION.getCode());
         apiReponse.setMessage(ErrorCode.UNCATEGORIZED_EXEPTION.getMessage());
@@ -89,4 +89,5 @@ public class GlobalExeptionHandle {
 
         return message.replace("{"+ MIN_ATTRIBUTE+"}",minValue);
     }
+    
 }

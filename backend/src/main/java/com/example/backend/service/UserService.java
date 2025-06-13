@@ -46,9 +46,6 @@ public class UserService {
 
         HashSet<String> role = new HashSet<>();
         role.add(Role.USER.name());
-
-        user.setSentRequests(new HashSet<>());
-        user.setReceiverRequests(new HashSet<>());
         
         return userMapper.toUserReponse(userRepository.save(user));
     }
@@ -56,38 +53,42 @@ public class UserService {
     @PreAuthorize("hasRole('ADMIN')")
     //@PreAuthorize("hasAuthority('APPROVE_POST')")
     public List<UserResponse> getListUsers(){
-        log.info("login with admin");
+        List<User> users = userRepository.findAll();
+        log.info("number of users: {}",users.size());
         return userRepository.findAll().stream().map(userMapper::toUserReponse).toList();
     }
 
     public UserResponse getMyInfor(){
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
-
         User user = userRepository.findByUsername(name).orElseThrow(
             ()->new AppExeption(ErrorCode.USERID_NOT_EXITTED));
         return userMapper.toUserReponse(user);
     }
 
-    public UserResponse findUserId(Long id){
+    public UserResponse findUserId(String id){
         return userMapper.toUserReponse(userRepository.findById(id)
                         .orElseThrow(() -> new RuntimeException("User not found")));
     }
 
-    public UserResponse updateUserId(Long userId,UserUpdateRequest request){
+    public UserResponse updateUserId(String userId,UserUpdateRequest request){
 
         User user = userRepository.findById(userId)
                                   .orElseThrow(() -> new RuntimeException("User not found"));
         userMapper.updateUser(user, request);
-
+        
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         var roles = roleRepository.findAllById(request.getRoles());
+        if(roles.isEmpty()){
+            log.warn("Roles not found for: {}", request.getRoles());
+            throw new RuntimeException("Roles not found");
+        }
         user.setRoles(new HashSet<>(roles));
 
         return userMapper.toUserReponse(userRepository.save(user));
     }
-    public void deleteUser(Long userId){
+    public void deleteUser(String userId){
         userRepository.deleteById(userId);
     }
 }

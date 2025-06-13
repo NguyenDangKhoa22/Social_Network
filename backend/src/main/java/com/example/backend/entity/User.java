@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 
 import jakarta.persistence.GeneratedValue;
@@ -30,12 +31,18 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(length = 36,nullable = false, updatable = false,unique = true)
+    String id;
+
     String username;
+
     String password;
+
     String firstName;
+
     String lastName;
+
     LocalDate dob;
 
     @ManyToMany

@@ -34,8 +34,8 @@ public class UserController {
     UserService userService;
 
     @PostMapping
-
     ApiReponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request){
+        log.info(">> Creating permission: {}", request.getUsername());
         ApiReponse<UserResponse> apiReponse = new ApiReponse<>();
         apiReponse.setResult(userService.createUser(request));
         return apiReponse;
@@ -43,12 +43,11 @@ public class UserController {
     @GetMapping
     ApiReponse<List<UserResponse>> getUsers(){
         var authenlication = SecurityContextHolder.getContext().getAuthentication();
-        log.info("Username : {}",authenlication.getName());
         authenlication.getAuthorities().forEach(grantedAuthority->log.info(grantedAuthority.getAuthority()));
         return ApiReponse.<List<UserResponse>>builder().result(userService.getListUsers()).build();
     }
     @GetMapping("/{userId}")
-    UserResponse getUser(@PathVariable("userId") Long userId){
+    UserResponse getUser(@PathVariable("userId") String userId){
         return userService.findUserId(userId);
     }
     @GetMapping("/myInfor")
@@ -56,11 +55,11 @@ public class UserController {
         return ApiReponse.<UserResponse>builder().result(userService.getMyInfor()).build();
     }
     @PutMapping("/{userId}")
-    UserResponse updateUser(@PathVariable Long userId,@RequestBody UserUpdateRequest request){
+    UserResponse updateUser(@PathVariable String userId,@RequestBody UserUpdateRequest request){
         return userService.updateUserId(userId, request);
     }
     @DeleteMapping("/{userId}")
-    String deleteUser(@PathVariable Long userId){
+    String deleteUser(@PathVariable String userId){
         userService.deleteUser(userId);
         return "user has been deleted";
     }

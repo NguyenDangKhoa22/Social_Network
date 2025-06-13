@@ -1,4 +1,5 @@
-package com.example.backend.dto.response.friendfuction;
+package com.example.backend.dto.request;
+
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,8 +13,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FriendDTO {
-    String id;
-    String firstName;
-    String lastName;
+public class BlackListTokenRequest {
+    String token;
 }
