@@ -16,6 +16,7 @@ import org.springframework.util.CollectionUtils;
 import com.example.backend.dto.request.AuthenticationRequest;
 import com.example.backend.dto.request.BlackListTokenRequest;
 import com.example.backend.dto.request.IntroSpectRequest;
+import com.example.backend.dto.request.RefreshTokenRequest;
 import com.example.backend.dto.response.AuthenticationResponse;
 import com.example.backend.dto.response.IntroSpectResponse;
 import com.example.backend.entity.BlackListToken;
@@ -52,12 +53,20 @@ public class UserAuthService {
     @Value("${jwt.signerKey}")
     protected String SECRET_KEY ;
 
+    @NonFinal
+    @Value("${jwt.valid-duration}")
+    protected Long VALID_DURATION;
+
+    @NonFinal
+    @Value("${jwt.refreshable-duration}")
+    protected Long REFRESHABLE_DURATION;
+
 
     public IntroSpectResponse introSpect(IntroSpectRequest request) throws JOSEException, ParseException{
         var token = request.getToken();
         boolean isValid = true;
         try{
-            verifyToken(token);
+            verifyToken(token,false);
         }catch (AppExeption e){
             isValid = false;
         }
@@ -65,12 +74,14 @@ public class UserAuthService {
         return IntroSpectResponse.builder().valid(isValid).build();
     }
 
-    private SignedJWT verifyToken(String token) throws JOSEException, ParseException{
+    private SignedJWT verifyToken(String token, boolean refresh) throws JOSEException, ParseException{
         JWSVerifier verifier = new MACVerifier(SECRET_KEY.getBytes());
 
         SignedJWT signedJWT = SignedJWT.parse(token);
 
-        Date expiDate = signedJWT.getJWTClaimsSet().getExpirationTime();
+        Date expiDate = (refresh) 
+                ? new Date(signedJWT.getJWTClaimsSet().getIssueTime().toInstant().plus(REFRESHABLE_DURATION,ChronoUnit.SECONDS).toEpochMilli()) 
+                :signedJWT.getJWTClaimsSet().getExpirationTime();
 
         var verified =  signedJWT.verify(verifier);
          if(!(verified && expiDate.after(new Date())))
@@ -88,13 +99,38 @@ public class UserAuthService {
         return userId;
     }
     public void logout(BlackListTokenRequest request) throws JOSEException, ParseException{
-        var signToken = verifyToken(request.getToken());
-        String jit = signToken.getJWTClaimsSet().getJWTID();
-        Date expiry = signToken.getJWTClaimsSet().getExpirationTime();
-        BlackListToken blackListToken = BlackListToken.builder().expiryTime(expiry).token(jit).build();
-        blackListTokenRepository.save(blackListToken);
-    }
+        try {
+            var signToken = verifyToken(request.getToken(),true);
 
+            String jit = signToken.getJWTClaimsSet().getJWTID();
+            Date expiry = signToken.getJWTClaimsSet().getExpirationTime();
+
+            BlackListToken blackListToken = BlackListToken.builder().expiryTime(expiry).token(jit).build();
+            blackListTokenRepository.save(blackListToken);
+        } catch (AppExeption e) {
+            log.info("Token aldready expired");
+        }
+        
+    }
+    public AuthenticationResponse refreshToken(RefreshTokenRequest request) 
+        throws JOSEException, ParseException{
+        var signedJWT = verifyToken(request.getToken(),true);
+        var jit = signedJWT.getJWTClaimsSet().getJWTID();
+        var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+        BlackListToken blackListToken = BlackListToken.builder().expiryTime(expiryTime).token(jit).build();
+        blackListTokenRepository.save(blackListToken);
+        
+        var username = signedJWT.getJWTClaimsSet().getSubject();
+
+        var user = userRepository.findByUsername(username).orElseThrow(
+            ()-> new AppExeption(ErrorCode.USERID_NOT_EXITTED)
+            );
+
+
+        var token =  generateToken(user);
+        return AuthenticationResponse.builder().token(token).authenticated(true).build();
+    }
     
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
@@ -119,7 +155,7 @@ public class UserAuthService {
                     .subject(user.getUsername())
                     .issuer("localhost:8080")
                     .issueTime(new Date())
-                    .expirationTime(Date.from(Instant.now().plus(1,ChronoUnit.HOURS)))
+                    .expirationTime(new Date(Instant.now().plus(VALID_DURATION,ChronoUnit.SECONDS).toEpochMilli()))
                     .jwtID(UUID.randomUUID().toString())
                     .claim("userId", user.getId())
                     .claim("scope", builderScope(user))
