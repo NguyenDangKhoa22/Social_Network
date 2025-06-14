@@ -7,6 +7,7 @@ import com.example.backend.dto.request.ApiReponse;
 import com.example.backend.dto.request.AuthenticationRequest;
 import com.example.backend.dto.request.BlackListTokenRequest;
 import com.example.backend.dto.request.IntroSpectRequest;
+import com.example.backend.dto.request.RefreshTokenRequest;
 import com.example.backend.dto.response.AuthenticationResponse;
 import com.example.backend.dto.response.IntroSpectResponse;
 import com.example.backend.service.UserAuthService;
@@ -45,5 +46,11 @@ public class UserAuthenticate {
     public ApiReponse<Void> authenticate(@RequestBody BlackListTokenRequest request) throws JOSEException, ParseException{
         userAuthService.logout(request);
         return ApiReponse.<Void>builder().build();
+    }
+    @PostMapping("/refresh")
+    public ApiReponse<AuthenticationResponse> refreshToken(@RequestBody RefreshTokenRequest request) 
+        throws JOSEException, ParseException{
+        var result = userAuthService.refreshToken(request);
+        return ApiReponse.<AuthenticationResponse>builder().result(result).build();
     }
 }
