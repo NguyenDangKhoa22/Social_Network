@@ -12,6 +12,12 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/social_db?useSSL=false&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_DATABASE: social_mongo
+      SPRING_DATA_MONGODB_USERNAME: root
+      SPRING_DATA_MONGODB_PASSWORD: root
+      SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE: admin
     networks:
       - social_network
 
@@ -28,9 +34,23 @@ services:
       - db_data:/var/lib/mysql
     networks:
       - social_network
+  mongodb:
+    image: mongo:latest
+    container_name: social_mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root 
+      MONGO_INITDB_ROOT_PASSWORD: root
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - social_network
 
 volumes:
   db_data:
+  mongo_data:
 
 networks:
   social_network:
