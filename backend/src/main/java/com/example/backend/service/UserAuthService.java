@@ -2,12 +2,14 @@ package com.example.backend.service;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.StringJoiner;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -80,7 +82,7 @@ public class UserAuthService {
         SignedJWT signedJWT = SignedJWT.parse(token);
 
         Date expiDate = (refresh) 
-                ? new Date(signedJWT.getJWTClaimsSet().getIssueTime().toInstant().plus(REFRESHABLE_DURATION,ChronoUnit.SECONDS).toEpochMilli()) 
+                ? new Date(signedJWT.getJWTClaimsSet().getIssueTime().toInstant().plus(REFRESHABLE_DURATION,ChronoUnit.HOURS).toEpochMilli()) 
                 :signedJWT.getJWTClaimsSet().getExpirationTime();
 
         var verified =  signedJWT.verify(verifier);
@@ -155,7 +157,7 @@ public class UserAuthService {
                     .subject(user.getUsername())
                     .issuer("localhost:8080")
                     .issueTime(new Date())
-                    .expirationTime(new Date(Instant.now().plus(VALID_DURATION,ChronoUnit.SECONDS).toEpochMilli()))
+                    .expirationTime(new Date(Instant.now().plus(VALID_DURATION,ChronoUnit.HOURS).toEpochMilli()))
                     .jwtID(UUID.randomUUID().toString())
                     .claim("userId", user.getId())
                     .claim("scope", builderScope(user))
@@ -188,4 +190,10 @@ public class UserAuthService {
         
         return stringJoiner.toString();
     }
+    @Scheduled(cron = "0 0 * * * *")
+    public void clearnUpExpiredToken(){
+        blackListTokenRepository.deleteExpiredToken(new Date());
+        System.out.println("Expired token clearn at: "+LocalDateTime.now());
+    }
+
 }
