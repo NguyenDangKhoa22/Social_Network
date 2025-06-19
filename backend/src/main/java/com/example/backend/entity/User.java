@@ -54,4 +54,7 @@ public class User {
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<FriendRequest> receiverRequests;
 
+    @OneToMany(mappedBy = "createBy", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<PageUser> pageCreated;
+
 }

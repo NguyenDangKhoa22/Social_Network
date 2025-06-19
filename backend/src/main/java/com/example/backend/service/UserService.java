@@ -80,6 +80,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         var roles = roleRepository.findAllById(request.getRoles());
+        
         if(roles.isEmpty()){
             log.warn("Roles not found for: {}", request.getRoles());
             throw new RuntimeException("Roles not found");
