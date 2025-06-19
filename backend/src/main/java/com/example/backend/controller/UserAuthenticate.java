@@ -16,13 +16,14 @@ import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 import java.text.ParseException;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -33,6 +34,7 @@ public class UserAuthenticate {
     @PostMapping("/login")
     public ApiReponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request){
         var result = userAuthService.authenticate(request);
+        log.info(request.getUsername());
         return ApiReponse.<AuthenticationResponse>builder().result(result).build();
     }
 
